@@ -1,5 +1,6 @@
 ﻿using AssetRipper.Assets;
 using AssetRipper.Assets.Bundles;
+using AssetRipper.Export.UnityProjects.Configuration;
 using AssetRipper.Import.Configuration;
 using AssetRipper.Import.Logging;
 using AssetRipper.IO.Files;
@@ -130,7 +131,8 @@ namespace AssetRipper.Export.UnityProjects
 		public void Export(GameBundle fileCollection, CoreConfiguration options)
 		{
 			EventExportPreparationStarted?.Invoke();
-			List<IExportCollection> collections = CreateCollections(fileCollection);
+			var cfg = options as LibraryConfiguration;
+			List<IExportCollection> collections = CreateCollections(fileCollection, exportClassList: cfg.ExportSettings.ExportClassList);
 			EventExportPreparationFinished?.Invoke();
 
 			EventExportStarted?.Invoke();
@@ -153,13 +155,17 @@ namespace AssetRipper.Export.UnityProjects
 			EventExportFinished?.Invoke();
 		}
 
-		private List<IExportCollection> CreateCollections(GameBundle fileCollection)
+		private List<IExportCollection> CreateCollections(GameBundle fileCollection, string exportClassList)
 		{
 			List<IExportCollection> collections = new();
 			HashSet<IUnityObjectBase> queued = new();
 
 			foreach (IUnityObjectBase asset in fileCollection.FetchAssets())
 			{
+				if (!string.IsNullOrWhiteSpace(exportClassList) && !exportClassList.Contains(asset.ClassName))
+				{
+					continue;
+				}
 				if (!queued.Contains(asset))
 				{
 					IExportCollection collection = CreateCollection(asset);

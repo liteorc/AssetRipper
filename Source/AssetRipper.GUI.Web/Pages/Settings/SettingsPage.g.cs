@@ -59,6 +59,9 @@ partial class SettingsPage
 			case nameof(ExportSettings.TextExportMode):
 				Configuration.ExportSettings.TextExportMode = TryParseEnum<TextExportMode>(value);
 				break;
+			case nameof(ExportSettings.ExportClassList):
+				Configuration.ExportSettings.ExportClassList = value;
+				break;
 		}
 	}
 
@@ -159,5 +162,17 @@ partial class SettingsPage
 	private static void WriteCheckBoxForSaveSettingsToDisk(TextWriter writer, string label)
 	{
 		WriteCheckBox(writer, label, Configuration.ExportSettings.SaveSettingsToDisk, nameof(ExportSettings.SaveSettingsToDisk));
+	}
+
+	private static void WriteTextBoxForSaveExportClassList(TextWriter writer)
+	{
+		new Label(writer).WithClass("form-label").WithFor(nameof(Configuration.ExportSettings.ExportClassList)).Close("Export Class List");
+		new Input(writer)
+			.WithType("text")
+			.WithClass("form-control")
+			.WithId(nameof(Configuration.ExportSettings.ExportClassList))
+			.WithName(nameof(Configuration.ExportSettings.ExportClassList))
+			.WithValue(Configuration.ExportSettings.ExportClassList)
+			.Close();
 	}
 }
